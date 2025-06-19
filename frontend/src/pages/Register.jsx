@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import api from '../api/axios';  // Assicurati di importare la configurazione Axios creata
+import React, { useState } from 'react';
+import api from '../api/axios';
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -11,24 +11,10 @@ const Register = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    // Pre-carica il cookie CSRF
-    const fetchCsrf = async () => {
-      try {
-        await api.get('/sanctum/csrf-cookie');
-        console.log("CSRF cookie ottenuto");
-      } catch (err) {
-        console.error("Errore nell'ottenere il CSRF cookie:", err);
-      }
-    };
-
-    fetchCsrf();
-  }, []);
-
   const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
+    setFormData({ 
+      ...formData, 
+      [e.target.name]: e.target.value 
     });
   };
 
@@ -38,19 +24,12 @@ const Register = () => {
     setLoading(true);
 
     try {
-      // Rinnova il cookie CSRF (opzionale se già impostato in useEffect)
-      await api.get('/sanctum/csrf-cookie');
-
-      // Invia la richiesta di registrazione al backend
       const response = await api.post('/register', formData);
-      console.log("Registrazione completata:", response.data);
+      console.log('Registrazione completata:', response.data);
+      // Qui puoi aggiungere la logica post-registrazione (redirezione, display di un messaggio, ecc.)
     } catch (err) {
-      console.error("Errore durante la registrazione:", err);
-      setError(
-        err.response && err.response.data && err.response.data.message
-          ? err.response.data.message
-          : "Errore durante la registrazione."
-      );
+      console.error('Errore durante la registrazione:', err);
+      setError(err.response?.data?.message || 'Errore durante la registrazione.');
     }
 
     setLoading(false);
@@ -109,7 +88,14 @@ const Register = () => {
             style={{ width: '100%', padding: '8px', marginTop: '4px' }}
           />
         </div>
-        <button type="submit" disabled={loading} style={{ padding: '10px 15px', cursor: loading ? 'not-allowed' : 'pointer' }}>
+        <button
+          type="submit"
+          disabled={loading}
+          style={{
+            padding: '10px 15px',
+            cursor: loading ? 'not-allowed' : 'pointer'
+          }}
+        >
           {loading ? 'Registrazione in corso...' : 'Registrati'}
         </button>
       </form>
