@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import api from '../api/axios';
+import api from '../api/axios'; // Assicurati che il percorso sia corretto
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -24,9 +24,10 @@ const Register = () => {
     setLoading(true);
 
     try {
+      // La chiamata POST a /register non richiederà il CSRF token
       const response = await api.post('/register', formData);
       console.log('Registrazione completata:', response.data);
-      // Qui puoi aggiungere la logica post-registrazione (redirezione, display di un messaggio, ecc.)
+      // Gestisci eventuali redirezioni o messaggi dopo la registrazione
     } catch (err) {
       console.error('Errore durante la registrazione:', err);
       setError(err.response?.data?.message || 'Errore durante la registrazione.');

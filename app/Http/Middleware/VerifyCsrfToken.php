@@ -9,11 +9,14 @@ class VerifyCsrfToken extends Middleware
     /**
      * Gli URI che dovrebbero essere esclusi dalla verifica CSRF.
      *
+     * È possibile aggiungere sia la forma senza barra iniziale che con la barra (per essere sicuri).
+     *
      * @var array
      */
     protected $except = [
         'register',
+        '/register',
         'login',
-        // Aggiungi altri endpoint se necessario per disabilitarli temporaneamente
+        '/login',
     ];
 }
