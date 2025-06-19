@@ -11,23 +11,38 @@ class UserRegisterController extends Controller
 {
     public function register(Request $request)
     {
-        // Validazione dell'input
+        // Valida i dati in ingresso (assicurati di inviare "password_confirmation" uguale a "password")
         $validatedData = $request->validate([
-            'name'     => 'required|string|max:255',
-            'email'    => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|confirmed|min:6',
+            'name'                  => 'required|string|max:255',
+            'email'                 => 'required|string|email|max:255|unique:users',
+            'password'              => 'required|string|confirmed|min:6',
         ]);
 
-        // Creazione dell'utente
-        $user = User::create([
-            'name'     => $validatedData['name'],
-            'email'    => $validatedData['email'],
-            'password' => bcrypt($validatedData['password']),
-        ]);
+        try {
+            // Crea l'utente
+            $user = User::create([
+                'name'     => $validatedData['name'],
+                'email'    => $validatedData['email'],
+                'password' => bcrypt($validatedData['password']),
+            ]);
 
-        // Login immediato
-        Auth::login($user);
+            // Effettua il login immediato
+            Auth::login($user);
 
-        return response()->json(['message' => 'Registrazione completata'], 201);
+            // Crea il token API (assicurati di avere Laravel Sanctum installato e migrato)
+            $token = $user->createToken('api-token')->plainTextToken;
+
+            return response()->json([
+                'message' => 'Registration successful',
+                'user'    => $user,
+                'token'   => $token,
+            ], 201);
+        } catch (\Exception $e) {
+            \Log::error('Registration Error: ' . $e->getMessage());
+            return response()->json([
+                'message' => 'Internal Server Error',
+                'error'   => $e->getMessage(),
+            ], 500);
+        }
     }
 }

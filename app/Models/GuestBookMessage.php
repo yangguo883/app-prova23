@@ -2,15 +2,18 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 
-class Message extends Model
+class GuestBookMessage extends Model
 {
     use HasFactory;
-
-    protected $fillable = ['message', 'user_id'];
-
+    
+    protected $fillable = [
+        'user_id',
+        'message',
+    ];
+    
     public function user()
     {
         return $this->belongsTo(User::class);
