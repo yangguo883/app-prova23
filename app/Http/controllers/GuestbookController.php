@@ -10,23 +10,20 @@ class GuestbookController extends Controller
 {
     public function index()
     {
-        $messages = Message::with('user')->latest()->get();
-        return view('guestbook', compact('messages'));
+        return Message::with('user')->latest()->get();
     }
 
-    public function addMessage(Request $request)
+    public function store(Request $request)
     {
         $request->validate([
-            'message' => 'required|string|max:25',
+            'message' => 'required|string|max:1000',
         ]);
 
-        $userId = Auth::id(); 
-
-        Message::create([
-            'message' => $request->input('message'),
-            'user_id' => $userId,
+        $message = Message::create([
+            'message' => $request->message,
+            'user_id' => Auth::id(),
         ]);
 
-        return redirect()->route('guestbook.index')->with('success', 'Messaggio inviato!');
+        return response()->json($message, 201);
     }
 }
