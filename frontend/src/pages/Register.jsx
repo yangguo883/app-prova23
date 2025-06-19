@@ -24,11 +24,11 @@ const Register = () => {
     setLoading(true);
 
     try {
-      // "users/register" concatenato al baseURL diventa:
-      // http://localhost:8000/api/users/register
+      // "users/register" sarà concatenato al baseURL, ottenendo:
+      // http://127.0.0.1:8000/api/users/register
       const response = await api.post('users/register', formData);
       console.log('Registrazione completata:', response.data);
-      // Eventuali redirezioni o notifiche di successo a questo punto
+      // Eventuali redirezioni o notifiche di successo qui
     } catch (err) {
       console.error('Errore durante la registrazione:', err);
       setError(err.response?.data?.message || 'Errore durante la registrazione.');

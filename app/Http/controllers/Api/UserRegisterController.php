@@ -25,10 +25,9 @@ class UserRegisterController extends Controller
             'password' => bcrypt($validatedData['password']),
         ]);
 
-        // Login immediato dell'utente
+        // Login immediato
         Auth::login($user);
 
         return response()->json(['message' => 'Registrazione completata'], 201);
     }
 }
-
