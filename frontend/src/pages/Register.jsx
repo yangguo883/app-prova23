@@ -1,92 +1,120 @@
-import React, { useState } from 'react';
-import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import api from '../api/axios';  // Assicurati di importare la configurazione Axios creata
 
-function Register() {
+const Register = () => {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     password: '',
     password_confirmation: '',
   });
-  const [errors, setErrors] = useState({});
-  const navigate = useNavigate();
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const handleChange = e => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+  useEffect(() => {
+    // Pre-carica il cookie CSRF
+    const fetchCsrf = async () => {
+      try {
+        await api.get('/sanctum/csrf-cookie');
+        console.log("CSRF cookie ottenuto");
+      } catch (err) {
+        console.error("Errore nell'ottenere il CSRF cookie:", err);
+      }
+    };
+
+    fetchCsrf();
+  }, []);
+
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
   };
 
-  const handleSubmit = async e => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setError('');
+    setLoading(true);
+
     try {
-      await axios.get('http://localhost:8000/sanctum/csrf-cookie', { withCredentials: true });
-      await axios.post('http://localhost:8000/register', formData, { withCredentials: true });
-      navigate('/guestbook');
+      // Rinnova il cookie CSRF (opzionale se già impostato in useEffect)
+      await api.get('/sanctum/csrf-cookie');
+
+      // Invia la richiesta di registrazione al backend
+      const response = await api.post('/register', formData);
+      console.log("Registrazione completata:", response.data);
     } catch (err) {
-      setErrors(err.response?.data?.errors || { general: 'Errore durante la registrazione' });
+      console.error("Errore durante la registrazione:", err);
+      setError(
+        err.response && err.response.data && err.response.data.message
+          ? err.response.data.message
+          : "Errore durante la registrazione."
+      );
     }
+
+    setLoading(false);
   };
 
   return (
-    <div className="bg-gray-100 min-h-screen flex items-center justify-center p-4">
-      <div className="bg-white rounded-lg shadow-lg max-w-md w-full p-8">
-        <h2 className="text-3xl font-extrabold text-center mb-6 text-gray-900">Registrati</h2>
-        {errors.general && <div className="mb-4 text-red-600">{errors.general}</div>}
-        <form onSubmit={handleSubmit} className="space-y-5">
-          <div>
-            <label className="block mb-1 font-semibold">Nome</label>
-            <input
-              name="name"
-              type="text"
-              value={formData.name}
-              onChange={handleChange}
-              required
-              className="w-full border p-3 rounded"
-            />
-          </div>
-          <div>
-            <label className="block mb-1 font-semibold">Email</label>
-            <input
-              name="email"
-              type="email"
-              value={formData.email}
-              onChange={handleChange}
-              required
-              className="w-full border p-3 rounded"
-            />
-          </div>
-          <div>
-            <label className="block mb-1 font-semibold">Password</label>
-            <input
-              name="password"
-              type="password"
-              value={formData.password}
-              onChange={handleChange}
-              required
-              className="w-full border p-3 rounded"
-            />
-          </div>
-          <div>
-            <label className="block mb-1 font-semibold">Conferma Password</label>
-            <input
-              name="password_confirmation"
-              type="password"
-              value={formData.password_confirmation}
-              onChange={handleChange}
-              required
-              className="w-full border p-3 rounded"
-            />
-          </div>
-          <button type="submit" className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-3 rounded">
-            Registrati
-          </button>
-        </form>
-        <div className="mt-4 text-center">
-          <a href="/" className="text-green-600 hover:underline">Hai già un account? Accedi</a>
+    <div style={{ maxWidth: '400px', margin: 'auto', padding: '20px' }}>
+      <h2>Registrazione</h2>
+      {error && <p style={{ color: 'red' }}>{error}</p>}
+      <form onSubmit={handleSubmit}>
+        <div style={{ marginBottom: '1rem' }}>
+          <label htmlFor="name">Nome:</label>
+          <input
+            type="text"
+            id="name"
+            name="name"
+            value={formData.name}
+            onChange={handleChange}
+            required
+            style={{ width: '100%', padding: '8px', marginTop: '4px' }}
+          />
         </div>
-      </div>
+        <div style={{ marginBottom: '1rem' }}>
+          <label htmlFor="email">Email:</label>
+          <input
+            type="email"
+            id="email"
+            name="email"
+            value={formData.email}
+            onChange={handleChange}
+            required
+            style={{ width: '100%', padding: '8px', marginTop: '4px' }}
+          />
+        </div>
+        <div style={{ marginBottom: '1rem' }}>
+          <label htmlFor="password">Password:</label>
+          <input
+            type="password"
+            id="password"
+            name="password"
+            value={formData.password}
+            onChange={handleChange}
+            required
+            style={{ width: '100%', padding: '8px', marginTop: '4px' }}
+          />
+        </div>
+        <div style={{ marginBottom: '1rem' }}>
+          <label htmlFor="password_confirmation">Conferma Password:</label>
+          <input
+            type="password"
+            id="password_confirmation"
+            name="password_confirmation"
+            value={formData.password_confirmation}
+            onChange={handleChange}
+            required
+            style={{ width: '100%', padding: '8px', marginTop: '4px' }}
+          />
+        </div>
+        <button type="submit" disabled={loading} style={{ padding: '10px 15px', cursor: loading ? 'not-allowed' : 'pointer' }}>
+          {loading ? 'Registrazione in corso...' : 'Registrati'}
+        </button>
+      </form>
     </div>
   );
-}
+};
 
 export default Register;
