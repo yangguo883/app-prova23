@@ -2,14 +2,28 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\GuestbookController;
+use Illuminate\Support\Facades\Auth;
+use App\Models\User;
 
-Route::get('/sanctum/csrf-cookie', function (Request $request) {
-    return response()->noContent();
-});
+Route::prefix('users')->group(function () {
+    Route::post('/register', function (Request $request) {
+        // Validazione dell'input
+        $validatedData = $request->validate([
+            'name'     => 'required|string|max:255',
+            'email'    => 'required|string|email|max:255|unique:users',
+            'password' => 'required|string|confirmed|min:6',
+        ]);
 
+        // Creazione dell'utente
+        $user = User::create([
+            'name'     => $validatedData['name'],
+            'email'    => $validatedData['email'],
+            'password' => bcrypt($validatedData['password']),
+        ]);
 
-Route::middleware('auth:sanctum')->group(function () {
-    Route::get('/posts', [GuestbookController::class, 'index']);
-    Route::post('/posts', [GuestbookController::class, 'store']);
+        // Login immediato dell'utente
+        Auth::login($user);
+
+        return response()->json(['message' => 'Registrazione completata'], 201);
+    });
 });

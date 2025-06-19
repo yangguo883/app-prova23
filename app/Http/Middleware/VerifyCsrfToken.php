@@ -9,7 +9,7 @@ class VerifyCsrfToken extends Middleware
     /**
      * Gli URI che dovrebbero essere esclusi dalla verifica CSRF.
      *
-     * È possibile aggiungere sia la forma senza barra iniziale che con la barra (per essere sicuri).
+     * Includiamo sia la forma senza slash iniziale che con la barra.
      *
      * @var array
      */

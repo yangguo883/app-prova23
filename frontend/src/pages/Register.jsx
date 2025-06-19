@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import api from '../api/axios'; // Assicurati che il percorso sia corretto
+import api from '../api/axios';
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -24,10 +24,11 @@ const Register = () => {
     setLoading(true);
 
     try {
-      // La chiamata POST a /register non richiederà il CSRF token
-      const response = await api.post('/register', formData);
+      // "users/register" sarà concatenato al baseURL, risultando in
+      // http://localhost:8000/api/users/register
+      const response = await api.post('users/register', formData);
       console.log('Registrazione completata:', response.data);
-      // Gestisci eventuali redirezioni o messaggi dopo la registrazione
+      // Qui potresti gestire redirezioni o notifiche di successo
     } catch (err) {
       console.error('Errore durante la registrazione:', err);
       setError(err.response?.data?.message || 'Errore durante la registrazione.');
@@ -37,65 +38,62 @@ const Register = () => {
   };
 
   return (
-    <div style={{ maxWidth: '400px', margin: 'auto', padding: '20px' }}>
-      <h2>Registrazione</h2>
-      {error && <p style={{ color: 'red' }}>{error}</p>}
+    <div className="max-w-md mx-auto p-6">
+      <h2 className="text-2xl font-bold mb-4">Registrazione</h2>
+      {error && <p className="text-red-600 mb-4">{error}</p>}
       <form onSubmit={handleSubmit}>
-        <div style={{ marginBottom: '1rem' }}>
-          <label htmlFor="name">Nome:</label>
+        <div className="mb-4">
+          <label htmlFor="name" className="block mb-1">Nome:</label>
           <input
             type="text"
             id="name"
             name="name"
+            className="w-full p-2 border rounded"
             value={formData.name}
             onChange={handleChange}
             required
-            style={{ width: '100%', padding: '8px', marginTop: '4px' }}
           />
         </div>
-        <div style={{ marginBottom: '1rem' }}>
-          <label htmlFor="email">Email:</label>
+        <div className="mb-4">
+          <label htmlFor="email" className="block mb-1">Email:</label>
           <input
             type="email"
             id="email"
             name="email"
+            className="w-full p-2 border rounded"
             value={formData.email}
             onChange={handleChange}
             required
-            style={{ width: '100%', padding: '8px', marginTop: '4px' }}
           />
         </div>
-        <div style={{ marginBottom: '1rem' }}>
-          <label htmlFor="password">Password:</label>
+        <div className="mb-4">
+          <label htmlFor="password" className="block mb-1">Password:</label>
           <input
             type="password"
             id="password"
             name="password"
+            className="w-full p-2 border rounded"
             value={formData.password}
             onChange={handleChange}
             required
-            style={{ width: '100%', padding: '8px', marginTop: '4px' }}
           />
         </div>
-        <div style={{ marginBottom: '1rem' }}>
-          <label htmlFor="password_confirmation">Conferma Password:</label>
+        <div className="mb-4">
+          <label htmlFor="password_confirmation" className="block mb-1">Conferma Password:</label>
           <input
             type="password"
             id="password_confirmation"
             name="password_confirmation"
+            className="w-full p-2 border rounded"
             value={formData.password_confirmation}
             onChange={handleChange}
             required
-            style={{ width: '100%', padding: '8px', marginTop: '4px' }}
           />
         </div>
         <button
           type="submit"
           disabled={loading}
-          style={{
-            padding: '10px 15px',
-            cursor: loading ? 'not-allowed' : 'pointer'
-          }}
+          className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 disabled:opacity-50"
         >
           {loading ? 'Registrazione in corso...' : 'Registrati'}
         </button>
@@ -105,3 +103,4 @@ const Register = () => {
 };
 
 export default Register;
+
