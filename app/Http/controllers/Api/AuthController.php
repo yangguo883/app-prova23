@@ -4,39 +4,33 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use App\Models\User;
 
 class AuthController extends Controller
 {
     public function login(Request $request)
     {
-        // Validazione delle credenziali
-        $credentials = $request->validate([
+        // Validazione degli input
+        $request->validate([
             'email'    => 'required|email',
-            'password' => 'required',
+            'password' => 'required'
         ]);
 
-        if (!Auth::attempt($credentials)) {
-            return response()->json(['message' => 'Invalid email or password'], 401);
+        // Ricerca dell'utente tramite email
+        $user = User::where('email', $request->input('email'))->first();
+
+        // Se l'utente non esiste o la password non corrisponde, restituisci errore 401
+        if (!$user || !Hash::check($request->input('password'), $user->password)) {
+            return response()->json(['error' => 'Credenziali non valide'], 401);
         }
 
-        // Se l'autenticazione va a buon fine
-        $user = Auth::user();
-        $token = $user->createToken('api-token')->plainTextToken;
+        // Genera il token tramite Sanctum
+        $token = $user->createToken('auth_token')->plainTextToken;
 
         return response()->json([
-            'message' => 'Login successful',
-            'user'    => $user,
-            'token'   => $token,
-        ], 200);
-    }
-    
-    public function logout(Request $request)
-    {
-        // Revoca di tutti i token dell'utente
-        $request->user()->tokens()->delete();
-        Auth::logout();
-        
-        return response()->json(['message' => 'Logged out successfully']);
+            'access_token' => $token,
+            'token_type'   => 'Bearer'
+        ]);
     }
 }

@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, NavLink } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, NavLink } from 'react-router-dom';
 import Register from './pages/Register';
 import Login from './pages/Login';
 import GuestBook from './pages/GuestBook';
@@ -13,36 +13,9 @@ function App() {
           <div className="container mx-auto px-6 py-4 flex justify-between items-center">
             <div className="text-2xl font-bold text-gray-800">MyGuestBook</div>
             <nav className="space-x-6">
-              <NavLink
-                to="/register"
-                className={({ isActive }) =>
-                  isActive
-                    ? "text-blue-600 font-semibold"
-                    : "text-gray-600 hover:text-blue-600"
-                }
-              >
-                Register
-              </NavLink>
-              <NavLink
-                to="/login"
-                className={({ isActive }) =>
-                  isActive
-                    ? "text-blue-600 font-semibold"
-                    : "text-gray-600 hover:text-blue-600"
-                }
-              >
-                Login
-              </NavLink>
-              <NavLink
-                to="/guestbook"
-                className={({ isActive }) =>
-                  isActive
-                    ? "text-blue-600 font-semibold"
-                    : "text-gray-600 hover:text-blue-600"
-                }
-              >
-                Guest Book
-              </NavLink>
+              <NavLink to="/register" className="text-gray-600 hover:text-blue-600">Register</NavLink>
+              <NavLink to="/login" className="text-gray-600 hover:text-blue-600">Login</NavLink>
+              <NavLink to="/guestbook" className="text-gray-600 hover:text-blue-600">Guest Book</NavLink>
             </nav>
           </div>
         </header>
@@ -50,6 +23,8 @@ function App() {
         {/* Main Content */}
         <main className="flex-grow container mx-auto px-6 py-10">
           <Routes>
+            {/* Redirect dalla root a /login se non ci sono route */}
+            <Route path="/" element={<Navigate to="/login" replace />} />
             <Route path="/register" element={<Register />} />
             <Route path="/login" element={<Login />} />
             <Route path="/guestbook" element={<GuestBook />} />

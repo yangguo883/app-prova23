@@ -14,24 +14,31 @@ const Login = () => {
     e.preventDefault();
     setError('');
     try {
-      const response = await api.post('login', formData);
-      localStorage.setItem('token', response.data.token);
-      navigate('/guestbook');
+      // Chiamata per impostare il CSRF cookie: attenzione, usa l'URL senza il prefisso "api/"
+      await api.get('sanctum/csrf-cookie');
+
+      // Poi chiama l'endpoint di login aggiungendo "api/" manualmente
+      const response = await api.post('api/login', formData);
+      if (response.data && response.data.token) {
+        localStorage.setItem('token', response.data.token);
+        navigate('/guestbook');
+      } else {
+        setError('Token non ricevuto');
+      }
     } catch (err) {
+      console.error('Login error:', err);
       setError(err.response?.data?.message || 'Login error');
     }
   };
 
   return (
-    <div className="flex justify-center items-center">
+    <div className="flex justify-center items-center min-h-screen bg-gray-100">
       <div className="w-full max-w-lg bg-white rounded-lg shadow-lg p-8 transform transition hover:scale-105">
         <h2 className="text-3xl font-bold text-center text-gray-800 mb-6">Login</h2>
         {error && <div className="mb-4 text-center text-red-500">{error}</div>}
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
-            <label htmlFor="email" className="block text-gray-700 mb-2">
-              Email
-            </label>
+            <label htmlFor="email" className="block text-gray-700 mb-2">Email</label>
             <input
               type="email"
               id="email"
@@ -43,9 +50,7 @@ const Login = () => {
             />
           </div>
           <div className="mb-6">
-            <label htmlFor="password" className="block text-gray-700 mb-2">
-              Password
-            </label>
+            <label htmlFor="password" className="block text-gray-700 mb-2">Password</label>
             <input
               type="password"
               id="password"

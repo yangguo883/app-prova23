@@ -1,7 +1,9 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'http://127.0.0.1:8000/api/', // Assicurati che il backend risponda su questo indirizzo
+  // Importante: non includere "api/" qui per poter chiamare correttamente il CSRF cookie
+  baseURL: 'http://127.0.0.1:8000/',
+  withCredentials: true,
   headers: {
     'Content-Type': 'application/json',
     'Accept': 'application/json'
